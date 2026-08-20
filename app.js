@@ -49,40 +49,52 @@ async function runAgents() {
     }
 }
 
-// Resilient API Call with Model Fallback
+// Auto-Detect Active Model & Execute Prompt
 async function callGemini(apiKey, prompt) {
-    // List of model endpoints to attempt in sequence
-    const modelsToTry = [
-        "gemini-2.5-flash",
-        "gemini-1.5-flash",
-        "gemini-1.5-pro"
-    ];
+    // 1. Fetch available models for your API key
+    let selectedModel = "gemini-2.5-flash"; // Default candidate
+    
+    try {
+        const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+        const listResponse = await fetch(listUrl);
+        const listData = await listResponse.json();
 
-    let lastError = null;
-
-    for (const model of modelsToTry) {
-        try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-            
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }]
-                })
-            });
-
-            const data = await response.json();
-
-            if (response.ok && data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-                return data.candidates[0].content.parts[0].text;
-            } else if (data.error) {
-                lastError = new Error(`${model} -> ${data.error.message}`);
+        if (listData.models && listData.models.length > 0) {
+            // Find a valid model supporting generateContent
+            const validModel = listData.models.find(m => 
+                m.supportedGenerationMethods && 
+                m.supportedGenerationMethods.includes("generateContent") &&
+                m.name.includes("flash")
+            );
+            if (validModel) {
+                // Extract clean model identifier (e.g. "models/gemini-2.5-flash" -> "gemini-2.5-flash")
+                selectedModel = validModel.name.replace("models/", "");
             }
-        } catch (e) {
-            lastError = e;
         }
+    } catch (e) {
+        console.warn("Auto-model detection skipped, attempting default model.");
     }
 
-    throw lastError || new Error("Failed to connect to any Gemini API endpoint.");
+    // 2. Call the active model
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
+    
+    const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+        })
+    });
+
+    const data = await response.json();
+
+    if (data.error) {
+        throw new Error(`[Model: ${selectedModel}] ${data.error.message}`);
+    }
+
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+        throw new Error("Invalid API key or empty response received from Google.");
+    }
+
+    return data.candidates[0].content.parts[0].text;
 }
