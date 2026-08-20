@@ -49,34 +49,37 @@ async function runAgents() {
     }
 }
 
-// Auto-Detect Active Model & Execute Prompt
+// Dynamic Model Detection Call Function
 async function callGemini(apiKey, prompt) {
-    // 1. Fetch available models for your API key
-    let selectedModel = "gemini-2.5-flash"; // Default candidate
-    
+    // Step 1: Fetch list of available models for this specific API key
+    let targetModel = "";
     try {
         const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
-        const listResponse = await fetch(listUrl);
-        const listData = await listResponse.json();
+        const listRes = await fetch(listUrl);
+        const listData = await listRes.json();
 
         if (listData.models && listData.models.length > 0) {
-            // Find a valid model supporting generateContent
-            const validModel = listData.models.find(m => 
+            // Find an active model that supports text generation
+            const activeModelObj = listData.models.find(m => 
                 m.supportedGenerationMethods && 
                 m.supportedGenerationMethods.includes("generateContent") &&
-                m.name.includes("flash")
+                (m.name.includes("flash") || m.name.includes("pro"))
             );
-            if (validModel) {
-                // Extract clean model identifier (e.g. "models/gemini-2.5-flash" -> "gemini-2.5-flash")
-                selectedModel = validModel.name.replace("models/", "");
+            if (activeModelObj) {
+                targetModel = activeModelObj.name; // e.g. "models/gemini-1.5-flash" or active version
             }
         }
     } catch (e) {
-        console.warn("Auto-model detection skipped, attempting default model.");
+        console.warn("Could not list models automatically, attempting fallback endpoint.");
     }
 
-    // 2. Call the active model
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
+    // Step 2: Fallback if list endpoint didn't return a match
+    if (!targetModel) {
+        targetModel = "models/gemini-1.5-flash";
+    }
+
+    // Step 3: Call the active model
+    const url = `https://generativelanguage.googleapis.com/v1beta/${targetModel}:generateContent?key=${apiKey}`;
     
     const response = await fetch(url, {
         method: "POST",
@@ -89,11 +92,11 @@ async function callGemini(apiKey, prompt) {
     const data = await response.json();
 
     if (data.error) {
-        throw new Error(`[Model: ${selectedModel}] ${data.error.message}`);
+        throw new Error(data.error.message);
     }
 
     if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-        throw new Error("Invalid API key or empty response received from Google.");
+        throw new Error("No response content generated from the model.");
     }
 
     return data.candidates[0].content.parts[0].text;
