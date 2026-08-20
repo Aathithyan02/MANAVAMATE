@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-    // Enable CORS so your frontend web page can communicate with this backend
+    // CORS headers allowing GitHub Pages frontend access
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -9,38 +9,20 @@ export default async function handler(req, res) {
     }
 
     if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Only POST requests allowed' });
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 
     const { prompt } = req.body;
-    // Retrieves your key safely from Vercel Environment Variables
-    const apiKey = process.env.GEMINI_API_KEY; 
+    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-        return res.status(500).json({ error: 'Server API key missing' });
+        return res.status(500).json({ error: 'GEMINI_API_KEY environment variable is not configured on Vercel.' });
     }
 
     try {
-        // Query model list to fetch active Gemini model
-        let modelName = "gemini-1.5-flash";
-        try {
-            const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-            const listData = await listRes.json();
-            if (listData.models && listData.models.length > 0) {
-                const found = listData.models.find(m => 
-                    m.supportedGenerationMethods && 
-                    m.supportedGenerationMethods.includes("generateContent")
-                );
-                if (found && found.name) {
-                    modelName = found.name.replace(/^models\//, "");
-                }
-            }
-        } catch (e) {
-            console.warn("Using fallback model.");
-        }
-
-        // Call Gemini API securely from server side
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+        // Direct call using standard endpoint
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -50,9 +32,13 @@ export default async function handler(req, res) {
         });
 
         const data = await response.json();
-        
+
         if (data.error) {
             return res.status(400).json({ error: data.error.message });
+        }
+
+        if (!data.candidates || !data.candidates[0]) {
+            return res.status(500).json({ error: 'Empty response returned from Google API.' });
         }
 
         const text = data.candidates[0].content.parts[0].text;
