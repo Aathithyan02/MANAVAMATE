@@ -1,5 +1,5 @@
 // Replace with your Vercel URL
-const BACKEND_URL = "https://YOUR_VERCEL_APP_NAME.vercel.app/api/generate"; 
+const BACKEND_URL = "https://manavamate.vercel.app/api/generate"; 
 
 async function runAgents() {
     const topic = document.getElementById("topicInput").value.trim();
