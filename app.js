@@ -44,23 +44,45 @@ async function runAgents() {
         document.getElementById("outputArea").classList.remove("hidden");
 
     } catch (error) {
-        alert("API Error: " + error.message);
+        alert("MANAVAMATE API Error: " + error.message);
         document.getElementById("loading").classList.add("hidden");
     }
 }
 
+// Resilient API Call with Model Fallback
 async function callGemini(apiKey, prompt) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-    
-    const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-        })
-    });
+    // List of model endpoints to attempt in sequence
+    const modelsToTry = [
+        "gemini-2.5-flash",
+        "gemini-1.5-flash",
+        "gemini-1.5-pro"
+    ];
 
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-    return data.candidates[0].content.parts[0].text;
+    let lastError = null;
+
+    for (const model of modelsToTry) {
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }]
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+                return data.candidates[0].content.parts[0].text;
+            } else if (data.error) {
+                lastError = new Error(`${model} -> ${data.error.message}`);
+            }
+        } catch (e) {
+            lastError = e;
+        }
+    }
+
+    throw lastError || new Error("Failed to connect to any Gemini API endpoint.");
 }
