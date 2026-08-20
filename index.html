@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MANAVAMATE - Agentic ECE Tutor</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -21,32 +19,26 @@
             <p class="text-slate-400 mt-2 text-lg">Your Agentic ECE Study Partner | Tanglish Explanations • Math Proofs • Tamil Reels</p>
         </header>
 
-        <!-- Input Box -->
+        <!-- User Search Box (Zero Setup for Users) -->
         <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-2xl mb-8">
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-slate-300 mb-2">Gemini API Key:</label>
-                <input type="password" id="apiKeyInput" placeholder="Paste your free Gemini API key here..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-amber-500 transition">
-            </div>
-
             <div class="mb-6">
-                <label class="block text-sm font-semibold text-slate-300 mb-2">ECE Topic / Subject Question:</label>
+                <label class="block text-sm font-semibold text-slate-300 mb-2">Ask MANAVAMATE Any ECE Question:</label>
                 <input type="text" id="topicInput" placeholder="e.g., PN Junction Diode, Op-Amp Inverting Mode, FFT vs DFT" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-amber-500 transition">
             </div>
 
             <button id="generateBtn" onclick="runAgents()" class="w-full bg-gradient-to-r from-amber-500 via-orange-500 to-pink-600 hover:opacity-90 text-slate-950 font-bold py-3.5 rounded-xl transition duration-200 text-lg shadow-lg">
-                🚀 Launch MANAVAMATE Agents
+                🚀 Ask MANAVAMATE
             </button>
         </div>
 
         <!-- Loading Spinner -->
         <div id="loading" class="hidden text-center py-10">
             <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-amber-500 border-t-transparent"></div>
-            <p class="text-slate-400 mt-4 text-base animate-pulse">MANAVAMATE agents are generating Tanglish insights & derivations...</p>
+            <p class="text-slate-400 mt-4 text-base animate-pulse">MANAVAMATE agents are generating Tanglish insights...</p>
         </div>
 
-        <!-- Output Cards -->
+        <!-- Output Display -->
         <div id="outputArea" class="hidden space-y-6">
-            <!-- Tanglish Card -->
             <div class="bg-slate-800 border border-amber-500/30 rounded-2xl p-6 shadow-lg">
                 <h2 class="text-xl font-bold text-amber-400 mb-3 flex items-center gap-2">
                     <i class="fa-solid fa-comments"></i> Tanglish Concept Breakdown
@@ -54,7 +46,6 @@
                 <div id="tanglishOutput" class="text-slate-300 leading-relaxed space-y-3"></div>
             </div>
 
-            <!-- Formula Card -->
             <div class="bg-slate-800 border border-cyan-500/30 rounded-2xl p-6 shadow-lg">
                 <h2 class="text-xl font-bold text-cyan-400 mb-3 flex items-center gap-2">
                     <i class="fa-solid fa-calculator"></i> Mathematical Derivation & Formulas
@@ -62,7 +53,6 @@
                 <div id="mathOutput" class="text-slate-300 leading-relaxed font-mono"></div>
             </div>
 
-            <!-- Reels & Media Card -->
             <div class="bg-slate-800 border border-pink-500/30 rounded-2xl p-6 shadow-lg">
                 <h2 class="text-xl font-bold text-pink-400 mb-3 flex items-center gap-2">
                     <i class="fa-solid fa-film"></i> Suggested Tamil Reels & Shorts
