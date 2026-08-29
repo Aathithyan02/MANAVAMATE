@@ -16,7 +16,7 @@
             <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 tracking-tight">
                 🎓 MANAVAMATE
             </h1>
-            <p class="text-slate-400 mt-2 text-lg">Your Agentic ECE Study Partner | Tanglish Explanations • Math Proofs • Tamil Reels</p>
+            <p class="text-slate-400 mt-2 text-lg">Your Agentic ECE Study Partner | Tanglish Explanations • 2 / 5 / 13 Mark Exam Answers • Tamil Reels</p>
         </header>
 
         <!-- User Search Box (Zero Setup for Users) -->
@@ -34,7 +34,22 @@
         <!-- Loading Spinner -->
         <div id="loading" class="hidden text-center py-10">
             <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-amber-500 border-t-transparent"></div>
-            <p class="text-slate-400 mt-4 text-base animate-pulse">MANAVAMATE agents are generating Tanglish insights...</p>
+            <p id="loadingText" class="text-slate-400 mt-4 text-base animate-pulse">MANAVAMATE agents are writing your Tanglish notes &amp; exam answers...</p>
+        </div>
+
+        <!-- Off-topic Guard -->
+        <div id="offTopic" class="hidden bg-slate-800 border border-rose-500/40 rounded-2xl p-6 shadow-lg text-center">
+            <i class="fa-solid fa-triangle-exclamation text-3xl text-rose-400 mb-3"></i>
+            <h2 class="text-xl font-bold text-rose-400 mb-2">Machan, adhu ECE topic illa!</h2>
+            <p class="text-slate-300">
+                "<span id="offTopicTopic" class="font-semibold text-slate-100"></span>" is outside my syllabus.
+                Naan ECE subjects mattum thaan help panna mudiyum - electronics, circuits, signals,
+                communication, digital logic, microprocessors, VLSI, embedded systems, antennas, control systems.
+            </p>
+            <p class="text-slate-400 mt-3 text-sm">Try something like <em>PN Junction Diode</em>, <em>Op-Amp Inverting Mode</em>, or <em>Nyquist Criterion</em>.</p>
+            <button onclick="tryAnotherTopic()" class="mt-4 bg-slate-700 hover:bg-slate-600 text-slate-100 font-semibold px-5 py-2.5 rounded-xl transition">
+                <i class="fa-solid fa-rotate-left mr-2"></i> Try another topic
+            </button>
         </div>
 
         <!-- Output Display -->
@@ -46,11 +61,25 @@
                 <div id="tanglishOutput" class="text-slate-300 leading-relaxed space-y-3"></div>
             </div>
 
-            <div class="bg-slate-800 border border-cyan-500/30 rounded-2xl p-6 shadow-lg">
-                <h2 class="text-xl font-bold text-cyan-400 mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-calculator"></i> Mathematical Derivation & Formulas
+            <div class="bg-slate-800 border border-emerald-500/30 rounded-2xl p-6 shadow-lg">
+                <h2 class="text-xl font-bold text-emerald-400 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-bolt"></i> How to Write it for <span class="bg-emerald-500/15 px-2 py-0.5 rounded-lg">2 Marks</span>
                 </h2>
-                <div id="mathOutput" class="text-slate-300 leading-relaxed font-mono"></div>
+                <div id="twoMarkOutput" class="text-slate-300 leading-relaxed space-y-3 exam-answer"></div>
+            </div>
+
+            <div id="fiveMarkCard" class="bg-slate-800 border border-cyan-500/30 rounded-2xl p-6 shadow-lg">
+                <h2 class="text-xl font-bold text-cyan-400 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check"></i> How to Write it for <span class="bg-cyan-500/15 px-2 py-0.5 rounded-lg">5 Marks</span>
+                </h2>
+                <div id="fiveMarkOutput" class="text-slate-300 leading-relaxed space-y-3 exam-answer"></div>
+            </div>
+
+            <div id="thirteenMarkCard" class="bg-slate-800 border border-violet-500/30 rounded-2xl p-6 shadow-lg">
+                <h2 class="text-xl font-bold text-violet-400 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-award"></i> How to Write it for <span class="bg-violet-500/15 px-2 py-0.5 rounded-lg">13 Marks</span>
+                </h2>
+                <div id="thirteenMarkOutput" class="text-slate-300 leading-relaxed space-y-3 exam-answer"></div>
             </div>
 
             <div class="bg-slate-800 border border-pink-500/30 rounded-2xl p-6 shadow-lg">
