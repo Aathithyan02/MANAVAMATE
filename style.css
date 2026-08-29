@@ -10,3 +10,36 @@ body {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+/* Tailwind preflight strips list styling - restore it for AI-generated answers */
+.exam-answer ul,
+.exam-answer ol {
+    margin: 0.5rem 0 0.75rem 1.25rem;
+}
+
+.exam-answer ul { list-style: disc; }
+.exam-answer ol { list-style: decimal; }
+
+.exam-answer li { margin-bottom: 0.4rem; }
+
+.exam-answer p { margin-bottom: 0.6rem; }
+
+.exam-answer strong { color: #f1f5f9; }
+
+/* Formulas: readable on paper, not LaTeX soup */
+.formula {
+    display: inline-block;
+    background: #0f172a;
+    border-left: 3px solid #f59e0b;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1rem;
+    margin: 0.6rem 0;
+    font-family: "Cambria", "Georgia", serif;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    color: #fcd34d;
+}
+
+.exam-answer sub, .exam-answer sup,
+#tanglishOutput sub, #tanglishOutput sup {
+    font-size: 0.7em;
+}
